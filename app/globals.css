@@ -24,3 +24,16 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+.chat-input-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  padding: 12px;
+  padding-bottom: calc(
+    env(safe-area-inset-bottom) + 12px
+  ); /* Biar tidak ketutup keyboard */
+  border-top: 1px solid #ddd;
+  z-index: 50;
+}

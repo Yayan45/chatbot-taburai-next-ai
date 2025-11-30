@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { taburaiData } from "../data/taburai";
 import Image from "next/image";
 import taburaiImg from "../public/taburai.png";
@@ -22,6 +22,28 @@ export default function Page() {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  // Auto scroll ke bawah
+  useEffect(() => {
+    chatRef.current?.scrollTo({
+      top: chatRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages, isTyping]);
+
+  // FIX: iPhone / Android keyboard push
+  useEffect(() => {
+    const onResize = () => {
+      chatRef.current?.scrollTo({
+        top: chatRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const formatHarga = (harga: number): string =>
     "Rp " + Number(harga).toLocaleString("id-ID");
@@ -76,6 +98,7 @@ JAM BUKA: ${taburaiData.jam_buka}
 
   const sendMessage = async () => {
     if (!input.trim()) return;
+
     const userMessage = input;
     setMessages((prev) => [...prev, { role: "user", text: userMessage }]);
     setInput("");
@@ -105,9 +128,7 @@ ${userMessage}
         }),
       });
 
-      if (!res.ok) throw new Error("Gagal menghubungi API");
       const data = await res.json();
-
       const aiText =
         data?.choices?.[0]?.message?.content?.[0]?.text ||
         data?.choices?.[0]?.message?.content ||
@@ -117,7 +138,10 @@ ${userMessage}
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: "⚠️ Gagal koneksi ke AI. Periksa API KEY ya." },
+        {
+          role: "bot",
+          text: "⚠️ Gagal koneksi ke AI. Periksa API KEY ya.",
+        },
       ]);
     } finally {
       setIsTyping(false);
@@ -126,7 +150,7 @@ ${userMessage}
 
   return (
     <div className="h-screen w-full flex justify-center items-center bg-[#111b21] p-2 sm:p-4">
-      <div className="w-full max-w-lg h-full flex flex-col bg-[#0b141a] rounded-lg overflow-hidden border border-[#27343b]">
+      <div className="w-full max-w-lg h-full flex flex-col bg-[#0b141a] rounded-lg overflow-hidden border border-[#27343b] relative">
         {/* HEADER */}
         <div className="p-3 flex items-center gap-3 bg-[#202c33] text-white shadow-md">
           <Image
@@ -137,10 +161,8 @@ ${userMessage}
             alt="Taburai"
           />
           <div className="flex-1">
-            <p className="font-semibold text-sm sm:text-base">
-              {taburaiData.nama_warung}
-            </p>
-            <p className="text-xs sm:text-sm text-gray-300">
+            <p className="font-semibold">{taburaiData.nama_warung}</p>
+            <p className="text-xs text-gray-300">
               {isTyping ? "Mengetik..." : "online"}
             </p>
           </div>
@@ -152,21 +174,23 @@ ${userMessage}
         </div>
 
         {/* CHAT AREA */}
-        <div className="flex-1 overflow-y-auto p-3 bg-[url('https://upload.wikimedia.org/wikipedia/commons/8/89/Whatsapp_background.png')] bg-cover">
+        <div
+          ref={chatRef}
+          className="flex-1 overflow-y-auto p-3 bg-[url('https://upload.wikimedia.org/wikipedia/commons/8/89/Whatsapp_background.png')] bg-cover"
+        >
           {messages.map((msg, i) => (
             <div
               key={i}
-              className={`my-1 p-2 rounded-lg max-w-[85%] sm:max-w-[75%] text-sm sm:text-base leading-relaxed shadow-sm ${
+              className={`my-1 p-2 rounded-lg max-w-[85%] sm:max-w-[75%] text-sm leading-relaxed shadow-sm ${
                 msg.role === "user"
                   ? "bg-[#005c4b] text-white ml-auto"
                   : "bg-[#202c33] text-gray-200 mr-auto"
               }`}
             >
-              {msg.text.split("\n").map((line, idx) => (
-                <p key={idx}>{line}</p>
-              ))}
+              {msg.text}
             </div>
           ))}
+
           {isTyping && (
             <div className="my-1 p-2 rounded-lg bg-[#202c33] text-gray-300 w-fit">
               Admin sedang mengetik...
@@ -174,22 +198,30 @@ ${userMessage}
           )}
         </div>
 
-        {/* INPUT */}
-        <div className="p-3 flex gap-2 items-center bg-[#1f2c34] border-t border-[#233138]">
+        {/* INPUT FIXED BAWAH */}
+        <div
+          className="p-3 flex gap-2 items-center bg-[#1f2c34] border-t border-[#233138] 
+          fixed bottom-0 left-0 w-full max-w-lg mx-auto 
+          pb-[calc(env(safe-area-inset-bottom)+8px)]
+        "
+        >
           <FaSmile className="text-gray-400 text-xl hidden sm:block" />
           <FaPaperclip className="text-gray-400 text-xl hidden sm:block" />
+
           <input
             type="text"
-            placeholder="Ketik pesan..."
             value={input}
+            placeholder="Ketik pesan..."
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            className="flex-1 bg-[#2a3942] text-gray-200 border border-[#3b4a54] rounded-lg px-3 py-2 focus:outline-none placeholder-gray-500 text-sm sm:text-base"
+            className="flex-1 bg-[#2a3942] text-gray-200 border border-[#3b4a54] rounded-lg px-3 py-2 focus:outline-none"
           />
+
           <FaMicrophone className="text-gray-400 text-xl hidden sm:block" />
+
           <button
             onClick={sendMessage}
-            className="bg-[#005c4b] hover:bg-[#036d59] text-white px-4 py-2 rounded-lg active:scale-95 text-sm sm:text-base"
+            className="bg-[#005c4b] hover:bg-[#036d59] text-white px-4 py-2 rounded-lg active:scale-95"
           >
             ➤
           </button>
