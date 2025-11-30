@@ -13,7 +13,7 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           ...req.body,
-          response_format: { type: "text" },
+          response_format: { type: "text" }, // 🔥 FIX BARU
         }),
       }
     );

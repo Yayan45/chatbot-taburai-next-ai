@@ -1,4 +1,4 @@
-"use client"; // wajib untuk komponen client
+"use client";
 
 import { useState } from "react";
 import { taburaiData } from "../data/taburai";
@@ -31,10 +31,10 @@ export default function Page() {
 
   const formatMenu = () => {
     const header = `
-  NAMA WARUNG: ${taburaiData.nama_warung}
-  PEMILIK: ${taburaiData.pemilik}
-  JAM BUKA: ${taburaiData.jam_buka}
-  `;
+NAMA WARUNG: ${taburaiData.nama_warung}
+PEMILIK: ${taburaiData.pemilik}
+JAM BUKA: ${taburaiData.jam_buka}
+`;
 
     const menus = Object.entries(taburaiData)
       .filter(([key]) =>
@@ -82,19 +82,18 @@ export default function Page() {
     setIsTyping(true);
 
     const prompt = `
-  Kamu adalah chatbot Warung Taburai.
-  Jawaban harus:
-  - Berdasarkan data yang tersedia.
-  - Jika data tidak ada, balas "Maaf, data tidak tersedia."
-  - Gunakan bahasa ramah seperti admin manusia.
-  - Jangan ubah format menu; menu sudah diformat oleh sistem.
+Kamu adalah chatbot Warung Taburai.
+Jawaban harus:
+- Berdasarkan data yang tersedia.
+- Jika data tidak ada, balas "Maaf, data tidak tersedia."
+- Gunakan bahasa ramah seperti admin manusia.
 
-  Menu:
-  ${formatMenu()}
+Menu:
+${formatMenu()}
 
-  Pertanyaan user:
-  ${userMessage}
-  `;
+Pertanyaan user:
+${userMessage}
+`;
 
     try {
       const res = await fetch("/api/chat", {
@@ -108,13 +107,14 @@ export default function Page() {
 
       if (!res.ok) throw new Error("Gagal menghubungi API");
       const data = await res.json();
+
       const aiText =
         data?.choices?.[0]?.message?.content?.[0]?.text ||
         data?.choices?.[0]?.message?.content ||
         "Maaf, Chatbot error saat membaca respon 😢";
 
       setMessages((prev) => [...prev, { role: "bot", text: aiText }]);
-    } catch (err) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         { role: "bot", text: "⚠️ Gagal koneksi ke AI. Periksa API KEY ya." },
@@ -125,8 +125,8 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-screen w-full flex justify-center items-center bg-[#111b21] p-2 sm:p-4">
-      <div className="w-full max-w-lg h-[90vh] sm:h-[95vh] flex flex-col bg-[#0b141a] rounded-lg overflow-hidden border border-[#27343b]">
+    <div className="h-screen w-full flex justify-center items-center bg-[#111b21] p-2 sm:p-4">
+      <div className="w-full max-w-lg h-full flex flex-col bg-[#0b141a] rounded-lg overflow-hidden border border-[#27343b]">
         {/* HEADER */}
         <div className="p-3 flex items-center gap-3 bg-[#202c33] text-white shadow-md">
           <Image
@@ -145,9 +145,9 @@ export default function Page() {
             </p>
           </div>
           <div className="hidden sm:flex items-center text-gray-300 gap-4 text-lg">
-            <FaPhone className="cursor-pointer hover:text-white" />
-            <FaVideo className="cursor-pointer hover:text-white" />
-            <FaEllipsisV className="cursor-pointer hover:text-white" />
+            <FaPhone />
+            <FaVideo />
+            <FaEllipsisV />
           </div>
         </div>
 
@@ -176,8 +176,8 @@ export default function Page() {
 
         {/* INPUT */}
         <div className="p-3 flex gap-2 items-center bg-[#1f2c34] border-t border-[#233138]">
-          <FaSmile className="text-gray-400 text-xl cursor-pointer hidden sm:block" />
-          <FaPaperclip className="text-gray-400 text-xl cursor-pointer hidden sm:block" />
+          <FaSmile className="text-gray-400 text-xl hidden sm:block" />
+          <FaPaperclip className="text-gray-400 text-xl hidden sm:block" />
           <input
             type="text"
             placeholder="Ketik pesan..."
@@ -186,7 +186,7 @@ export default function Page() {
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             className="flex-1 bg-[#2a3942] text-gray-200 border border-[#3b4a54] rounded-lg px-3 py-2 focus:outline-none placeholder-gray-500 text-sm sm:text-base"
           />
-          <FaMicrophone className="text-gray-400 text-xl cursor-pointer hidden sm:block" />
+          <FaMicrophone className="text-gray-400 text-xl hidden sm:block" />
           <button
             onClick={sendMessage}
             className="bg-[#005c4b] hover:bg-[#036d59] text-white px-4 py-2 rounded-lg active:scale-95 text-sm sm:text-base"
