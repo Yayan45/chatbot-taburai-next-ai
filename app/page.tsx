@@ -208,10 +208,11 @@ ${userMessage}
 
         {/* INPUT FIXED BAWAH */}
         <div
-          className="p-3 flex gap-2 items-center bg-[#1f2c34] border-t border-[#233138] 
-  fixed bottom-0  w-full max-w-lg
-  pb-[calc(env(safe-area-inset-bottom)+8px)]
-"
+          className="p-3 flex gap-2 items-center 
+  bg-[#1f2c34] border-t border-[#233138]
+  fixed bottom-0 left-1/2 -translate-x-1/2
+  w-full max-w-lg
+  pb-[calc(env(safe-area-inset-bottom)+8px)]"
         >
           <FaSmile className="text-gray-400 text-xl hidden sm:block" />
           <FaPaperclip className="text-gray-400 text-xl hidden sm:block" />
