@@ -106,10 +106,18 @@ JAM BUKA: ${taburaiData.jam_buka}
 
     const prompt = `
 Kamu adalah chatbot Warung Taburai.
-Jawaban harus:
-- Berdasarkan data yang tersedia.
-- Jika data tidak ada, balas "Maaf, data tidak tersedia."
-- Gunakan bahasa ramah seperti admin manusia.
+
+Format jawaban WAJIB seperti ini:
+- Gunakan paragraf rapi, jangan satu baris panjang.
+- Gunakan enter antar paragraf agar mudah dibaca.
+- Jika menyebutkan menu, tampilkan dalam bullet seperti:
+  • Nama menu - Harga
+  • Nama menu - Harga
+- Jangan gabungkan banyak informasi dalam satu paragraf.
+- Jawaban harus berdasarkan data Warung Taburai.
+- Jika data tidak tersedia, jawab: "Maaf, data tidak tersedia."
+- Gunakan bahasa yang ramah seperti admin manusia.
+
 
 Menu:
 ${formatMenu()}
@@ -130,9 +138,9 @@ ${userMessage}
 
       const data = await res.json();
       const aiText =
-        data?.choices?.[0]?.message?.content?.[0]?.text ||
-        data?.choices?.[0]?.message?.content ||
-        "Maaf, Chatbot error saat membaca respon 😢";
+        (data?.choices?.[0]?.message?.content || "")
+          .replace(/\n\n+/g, "\n\n")
+          .trim() || "Maaf, Chatbot error saat membaca respon 😢";
 
       setMessages((prev) => [...prev, { role: "bot", text: aiText }]);
     } catch {
@@ -176,7 +184,7 @@ ${userMessage}
         {/* CHAT AREA */}
         <div
           ref={chatRef}
-          className="flex-1 overflow-y-auto p-3 bg-[url('https://upload.wikimedia.org/wikipedia/commons/8/89/Whatsapp_background.png')] bg-cover"
+          className="flex-1 overflow-y-auto p-3 mb-10 bg-[url('https://upload.wikimedia.org/wikipedia/commons/8/89/Whatsapp_background.png')] bg-cover"
         >
           {messages.map((msg, i) => (
             <div
@@ -201,9 +209,9 @@ ${userMessage}
         {/* INPUT FIXED BAWAH */}
         <div
           className="p-3 flex gap-2 items-center bg-[#1f2c34] border-t border-[#233138] 
-          fixed bottom-0 left-0 w-full max-w-lg mx-auto 
-          pb-[calc(env(safe-area-inset-bottom)+8px)]
-        "
+  fixed bottom-0  w-full max-w-lg
+  pb-[calc(env(safe-area-inset-bottom)+8px)]
+"
         >
           <FaSmile className="text-gray-400 text-xl hidden sm:block" />
           <FaPaperclip className="text-gray-400 text-xl hidden sm:block" />
